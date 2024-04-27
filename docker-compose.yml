@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  busreservationsystem:
+    image: ${DOCKER_REGISTRY-}busreservationsystem
+    build:
+      context: .
+      dockerfile: BusReservationSystem/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres
+    networks:
+      - brs-network
+  postgres:
+    ports:
+      - '5432:5432'
+    container_name: brs-postgresql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
+    volumes:
+      - 'brs-postgresql-volume:/var/lib/postgresql/data'
+    image: postgres
+    networks:
+      - brs-network
+volumes:
+  brs-postgresql-volume:
+
+networks:
+  brs-network:
+    driver: bridge
