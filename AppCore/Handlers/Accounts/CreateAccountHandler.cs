@@ -1,18 +1,16 @@
 ﻿using AppCore.Database;
 using AppCore.Entities;
-using AppCore.Exceptions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace AppCore.Handlers.Accounts;
 
-public class CreateAccountHandlerCommand : IRequest<User>
+public class CreateAccountHandlerCommand : IRequest<Account>
 {
     public required string Username { get; set; }
     public required string Email { get; set; }
 }
 
-public class CreateAccountHandler : IRequestHandler<CreateAccountHandlerCommand, User>
+public class CreateAccountHandler : IRequestHandler<CreateAccountHandlerCommand, Account>
 {
     private readonly AppDbContext _context;
 
@@ -20,29 +18,8 @@ public class CreateAccountHandler : IRequestHandler<CreateAccountHandlerCommand,
     {
         _context = context;
     }
-    public async Task<User> Handle(CreateAccountHandlerCommand request, CancellationToken cancellationToken)
+    public async Task<Account> Handle(CreateAccountHandlerCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.NewGuid();
-
-        var userEntity = new User
-        {
-            UserId = userId,
-            Username = request.Username,
-            Email = request.Email
-        };
-
-        var getUser = await _context.Users.FirstOrDefaultAsync();
-
-        if (getUser is not null)
-        {
-            throw new UserExceptions("User already exists");
-        }
-
-        var user = await _context.Users.AddAsync(userEntity, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-
-
-        return userEntity;
+        return new Account { AccountId = Guid.NewGuid(), Address = "Address", Email = request.Email, FirstName = "FirstName", LastName = "LastName", PhoneNumber = "PhoneNumber", Username = request.Username };
     }
 }

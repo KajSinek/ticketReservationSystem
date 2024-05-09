@@ -9,7 +9,7 @@ namespace HomeApp.ApiCore.Database
         public AppDbContext CreateDbContext(string[] args)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../API"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BusReservationSystem"))
                 .AddJsonFile("appsettings.json")
                 .Build();
 
