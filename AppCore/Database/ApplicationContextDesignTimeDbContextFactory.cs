@@ -10,7 +10,7 @@ namespace HomeApp.ApiCore.Database
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BusReservationSystem"))
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettingsApp.json")
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();

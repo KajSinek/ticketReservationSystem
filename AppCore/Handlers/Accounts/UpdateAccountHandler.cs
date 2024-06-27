@@ -1,13 +1,13 @@
 ﻿using AppCore.Entities;
-using AppCore.Resources;
 using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
 
 namespace AppCore.Handlers.Accounts;
 
-public class CreateAccountHandlerCommand : IRequest<EntityResponse<Account>>
+public class UpdateAccountHandlerCommand : IRequest<EntityResponse<Account>>
 {
+    public required Guid AccountId { get; set; }
     public required string Username { get; set; }
     public required string Email { get; set; }
     public required string FirstName { get; set; }
@@ -16,29 +16,22 @@ public class CreateAccountHandlerCommand : IRequest<EntityResponse<Account>>
     public required string PhoneNumber { get; set; }
 }
 
-public class CreateAccountHandler(IBaseDbRequests baseDbRequests, ILogger<CreateAccountHandler> logger) : IRequestHandler<CreateAccountHandlerCommand, EntityResponse<Account>>
+public class UpdateAccountHandler(IBaseDbRequests baseDbRequests) : IRequestHandler<UpdateAccountHandlerCommand, EntityResponse<Account>>
 {
-    public async Task<EntityResponse<Account>> Handle(CreateAccountHandlerCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResponse<Account>> Handle(UpdateAccountHandlerCommand request, CancellationToken cancellationToken)
     {
         var entity = new Account
         {
-            AccountId = Guid.NewGuid(),
+            AccountId = request.AccountId,
             Username = request.Username,
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Address = request.Address,
             PhoneNumber = request.PhoneNumber
-        };
+        }; 
 
-        var response = await baseDbRequests.CreateAsync(entity);
-
-        if (response.Entity is null)
-        {
-            logger.LogError("Failed to create account");
-            response.Errors.Add(ErrorMessages.AccountFailedToCreate);
-            return response;
-        }
+        var response = await baseDbRequests.UpdateAsync(request.AccountId, entity);
 
         return response;
     }

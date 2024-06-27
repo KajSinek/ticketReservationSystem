@@ -1,6 +1,7 @@
 using AppCore.Database;
 using Microsoft.EntityFrameworkCore;
 using AppCore.Extensions;
+using Helpers.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IBaseDbRequests), typeof(BaseDbRequests<AppDbContext>));
 
 builder.AddCustomApplicationComponents();
 

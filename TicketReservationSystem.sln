@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppCore", "AppCore\AppCore.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRS.Tests", "TRS.Tests\TRS.Tests.csproj", "{0AC47EA0-2623-4B19-8A44-FEA896FB13A9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers", "Helpers\Helpers.csproj", "{64A8EC13-3370-48F5-B392-8192FB27169F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{0AC47EA0-2623-4B19-8A44-FEA896FB13A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AC47EA0-2623-4B19-8A44-FEA896FB13A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AC47EA0-2623-4B19-8A44-FEA896FB13A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64A8EC13-3370-48F5-B392-8192FB27169F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64A8EC13-3370-48F5-B392-8192FB27169F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64A8EC13-3370-48F5-B392-8192FB27169F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64A8EC13-3370-48F5-B392-8192FB27169F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
