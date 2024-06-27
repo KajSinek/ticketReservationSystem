@@ -1,5 +1,10 @@
 ﻿using AppCore.Entities;
 using Microsoft.EntityFrameworkCore;
+using AppCore.Database.EntityTypeConfiguration;
+using System.Text.RegularExpressions;
+using System.Data.SqlClient;
+using System.Reflection.Emit;
+using System.Net;
 
 namespace AppCore.Database;
 
@@ -9,6 +14,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Account>().HasKey(a => a.AccountId);
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfiguration(new AccountConfiguration());
     }
 }

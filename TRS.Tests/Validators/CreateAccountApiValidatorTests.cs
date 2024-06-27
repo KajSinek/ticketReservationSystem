@@ -1,6 +1,4 @@
-﻿using AppCore.Entities;
-using AppCore.Models;
-using AppCore.Validators;
+﻿using AppCore.Validators;
 
 namespace TRS.Tests.Validators;
 
