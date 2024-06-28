@@ -95,5 +95,14 @@ namespace AppCore.Resources {
                 return ResourceManager.GetString("EntityNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ticket with Name &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string TicketNameConflict {
+            get {
+                return ResourceManager.GetString("TicketNameConflict", resourceCulture);
+            }
+        }
     }
 }

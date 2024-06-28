@@ -129,4 +129,7 @@
   <data name="EntityNotFound" xml:space="preserve">
     <value>Entity '{0}' with ID '{1}' Not Found</value>
   </data>
+  <data name="TicketNameConflict" xml:space="preserve">
+    <value>Ticket with Name '{0}' already exists</value>
+  </data>
 </root>
