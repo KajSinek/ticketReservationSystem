@@ -74,7 +74,8 @@ public class AccountsController(IMediator mediator) : ControllerBase
     [SwaggerResponse(400, "Invalid input")]
     [SwaggerResponse(404, "Account not found")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteAccountAsync(Guid account_id, CancellationToken ct)
+    public async Task<IActionResult> DeleteAccountAsync([Required, FromRoute(Name = "account_id")] Guid account_id,
+                                                        CancellationToken ct)
     {
         var result = await mediator.Send(new DeleteAccountHandlerCommand { AccountId = account_id }, ct);
 
@@ -90,8 +91,8 @@ public class AccountsController(IMediator mediator) : ControllerBase
     [SwaggerResponse(400, "Invalid input")]
     [SwaggerResponse(404, "Account not found")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EntityResponse<Account>))]
-    public async Task<IActionResult> UpdateAccountAsync(Guid account_id,
-                                                        [FromBody, Bind] CreateAccountModel model,
+    public async Task<IActionResult> UpdateAccountAsync([Required, FromRoute(Name = "account_id")] Guid account_id,
+                                                        [FromBody, Bind] UpdateAccountModel model,
                                                         CancellationToken ct)
     {
         var result = await mediator.Send(new UpdateAccountHandlerCommand
