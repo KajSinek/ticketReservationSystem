@@ -11,4 +11,5 @@ public abstract class AccountApiDto(Account account)
     public string LastName { get; set; } = account.LastName;
     public string PhoneNumber { get; set; } = account.PhoneNumber;
     public string Address { get; set; } = account.Address;
+    public decimal AccountBalance { get; set; } = account.AccountBalance?.Value ?? 0;
 }
