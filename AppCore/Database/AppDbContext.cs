@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<AccountBalance> AccountBalances { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -15,5 +16,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.ApplyConfiguration(new AccountConfiguration());
         modelBuilder.ApplyConfiguration(new TicketConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountConfiguration());
     }
 }
