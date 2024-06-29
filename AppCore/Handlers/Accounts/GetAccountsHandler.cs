@@ -13,7 +13,7 @@ public class GetAccountsHandler(IBaseDbRequests baseDbRequests) : IRequestHandle
 {
     public async Task<EntitiesResponse<Account>> Handle(GetAccountsHandlerQuery request, CancellationToken cancellationToken)
     {
-        var list = await baseDbRequests.GetAllAsync<Account>();
-        return list;
+        var response = await baseDbRequests.GetAllAsync<Account>();
+        return response;
     }
 }

@@ -4,7 +4,7 @@ using Helpers.Responses;
 using Helpers.Services;
 using NSubstitute;
 
-namespace TRS.Tests.Handlers;
+namespace TRS.Tests.Handlers.Accounts;
 
 public class GetAccountsHandlerTests : TestBase
 {
