@@ -2,19 +2,22 @@
 using AppCore.Handlers.Accounts;
 using Helpers.Responses;
 using Helpers.Services;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 
-namespace TRS.Tests.Handlers;
+namespace TRS.Tests.Handlers.Accounts;
 
 public class GetAccountHandlerTests : TestBase
 {
     private readonly IBaseDbRequests _baseDbRequests;
+    private readonly ILogger<GetAccountHandler> _logger;
     private readonly GetAccountHandler _handler;
 
     public GetAccountHandlerTests()
     {
         _baseDbRequests = Substitute.For<IBaseDbRequests>();
-        _handler = Substitute.For<GetAccountHandler>(_baseDbRequests);
+        _logger = Substitute.For<ILogger<GetAccountHandler>>();
+        _handler = Substitute.For<GetAccountHandler>(_baseDbRequests, _logger);
     }
 
     [Fact]

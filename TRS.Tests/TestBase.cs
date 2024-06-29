@@ -1,5 +1,6 @@
 using AppCore.Entities;
 using AppCore.Models;
+using Helpers.Utilities;
 
 namespace TRS.Tests;
 
@@ -40,6 +41,22 @@ public class TestBase
             LastName = lastName ?? "Doe",
             PhoneNumber = phoneNumber ?? "123456789",
             Address = address ?? "1234 Elm St"
+        };
+    }
+
+    public static Ticket GetTestTicket(Guid? ticketId = null,
+                                       string? name = null,
+                                       decimal? price = null,
+                                       DateOnly? ExpirationDate = null,
+                                       DateOnly? ValidityStartDate = null)
+    {
+        return new Ticket
+        {
+            TicketId = ticketId ?? Guid.NewGuid(),
+            Name = name ?? "Test Ticket",
+            Price = price ?? 10.0m,
+            ExpirationDate = ExpirationDate ?? DateHelper.DateOnlyUtcNow,
+            ValidityStartDate = ValidityStartDate ?? DateHelper.DateOnlyUtcNow.AddDays(1)
         };
     }
 }

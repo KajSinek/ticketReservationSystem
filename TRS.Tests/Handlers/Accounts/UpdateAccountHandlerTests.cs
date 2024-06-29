@@ -5,19 +5,19 @@ using Helpers.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
-namespace TRS.Tests.Handlers;
+namespace TRS.Tests.Handlers.Accounts;
 
-public class CreateAccountHandlerTests : TestBase
+public class UpdateAccountHandlerTests : TestBase
 {
     private readonly IBaseDbRequests _baseDbRequests;
-    private readonly ILogger<CreateAccountHandler> _logger;
-    private readonly CreateAccountHandler _handler;
+    private readonly ILogger<UpdateAccountHandler> _logger;
+    private readonly UpdateAccountHandler _handler;
 
-    public CreateAccountHandlerTests()
+    public UpdateAccountHandlerTests()
     {
         _baseDbRequests = Substitute.For<IBaseDbRequests>();
-        _logger = Substitute.For<ILogger<CreateAccountHandler>>();
-        _handler = Substitute.For<CreateAccountHandler>(_baseDbRequests, _logger);
+        _logger = Substitute.For<ILogger<UpdateAccountHandler>>();
+        _handler = Substitute.For<UpdateAccountHandler>(_baseDbRequests, _logger);
     }
 
     [Fact]
@@ -26,10 +26,12 @@ public class CreateAccountHandlerTests : TestBase
         // Arrange
         var accountId = Guid.NewGuid();
         var account = GetTestAccount(accountId);
+        var updatedAccount = GetTestAccount(accountId, username: "marian");
 
-        var command = new CreateAccountHandlerCommand
+        var command = new UpdateAccountHandlerCommand
         {
-            Username = account.Username,
+            AccountId = accountId,
+            Username = "marian",
             Email = account.Email,
             Address = account.Address,
             FirstName = account.FirstName,
@@ -39,10 +41,10 @@ public class CreateAccountHandlerTests : TestBase
 
         var response = new EntityResponse<Account>
         {
-            Entity = account
+            Entity = updatedAccount
         };
 
-        _baseDbRequests.CreateAsync(Arg.Any<Account>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Account>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -58,11 +60,12 @@ public class CreateAccountHandlerTests : TestBase
     }
 
     [Fact]
-    public async Task Handle_WhenCreateAsyncReturnsNull_ThrowsException()
+    public async Task Handle_WhenUpdateAsyncReturnsNull_ThrowsException()
     {
         // Arrange
-        var command = new CreateAccountHandlerCommand
+        var command = new UpdateAccountHandlerCommand
         {
+            AccountId = Guid.NewGuid(),
             Username = "test",
             Email = "test",
             Address = "test",
@@ -76,7 +79,7 @@ public class CreateAccountHandlerTests : TestBase
             Entity = null
         };
 
-        _baseDbRequests.CreateAsync(Arg.Any<Account>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Account>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

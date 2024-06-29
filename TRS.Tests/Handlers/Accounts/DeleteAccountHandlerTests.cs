@@ -5,7 +5,7 @@ using Helpers.Services;
 using NSubstitute;
 using System.Net;
 
-namespace TRS.Tests.Handlers;
+namespace TRS.Tests.Handlers.Accounts;
 
 public class DeleteAccountHandlerTests : TestBase
 {
@@ -24,19 +24,20 @@ public class DeleteAccountHandlerTests : TestBase
         // Arrange
         var accountId = Guid.NewGuid();
 
-        var query = new DeleteAccountHandlerCommand
+        var command = new DeleteAccountHandlerCommand
         {
             AccountId = accountId
         };
 
-        var response = new Response {
+        var response = new Response
+        {
             Errors = new List<string>()
         };
 
         _baseDbRequests.DeleteAsync<Account>(Arg.Any<Guid>()).Returns(response);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);

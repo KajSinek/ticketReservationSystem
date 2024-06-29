@@ -14,6 +14,7 @@ public class DeleteAccountHandler(IBaseDbRequests baseDbRequests) : IRequestHand
     public async Task<Response> Handle(DeleteAccountHandlerCommand request, CancellationToken ct)
     {
         var response = await baseDbRequests.DeleteAsync<Account>(request.AccountId);
+
         return response;
     }
 }

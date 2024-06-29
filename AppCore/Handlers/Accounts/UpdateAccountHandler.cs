@@ -16,7 +16,7 @@ public class UpdateAccountHandlerCommand : IRequest<EntityResponse<Account>>
     public required string PhoneNumber { get; set; }
 }
 
-public class UpdateAccountHandler(IBaseDbRequests baseDbRequests) : IRequestHandler<UpdateAccountHandlerCommand, EntityResponse<Account>>
+public class UpdateAccountHandler(IBaseDbRequests baseDbRequests, ILogger<UpdateAccountHandler> logger) : IRequestHandler<UpdateAccountHandlerCommand, EntityResponse<Account>>
 {
     public async Task<EntityResponse<Account>> Handle(UpdateAccountHandlerCommand request, CancellationToken cancellationToken)
     {
@@ -32,6 +32,12 @@ public class UpdateAccountHandler(IBaseDbRequests baseDbRequests) : IRequestHand
         }; 
 
         var response = await baseDbRequests.UpdateAsync(request.AccountId, entity);
+
+        if (response.Entity is null)
+        {
+            logger.LogError("Failed to update Account");
+            return response;
+        }
 
         return response;
     }

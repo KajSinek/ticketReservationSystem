@@ -1,5 +1,4 @@
 ﻿using AppCore.Entities;
-using AppCore.Resources;
 using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
@@ -36,7 +35,6 @@ public class CreateAccountHandler(IBaseDbRequests baseDbRequests, ILogger<Create
         if (response.Entity is null)
         {
             logger.LogError("Failed to create account");
-            response.Errors.Add(ErrorMessages.AccountFailedToCreate);
             return response;
         }
 

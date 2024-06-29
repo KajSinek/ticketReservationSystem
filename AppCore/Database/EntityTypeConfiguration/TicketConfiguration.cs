@@ -17,7 +17,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.Property(x => x.Name)
             .IsRequired();
 
-        builder.HasIndex(x => x.TicketId)
+        builder.HasIndex(x => x.Name)
             .IsUnique()
             .HasAnnotation("Error_Message_Ticket", ErrorMessages.TicketNameConflict);
 
