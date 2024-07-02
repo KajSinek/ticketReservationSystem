@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BusReservationSystem.Controllers;
 
 [ApiController]
-public class AccountsController(IMediator mediator) : ControllerBase
+public partial class AccountsController(IMediator mediator) : ControllerBase
 {
     public const string GetAccountRouteName = "GetAccount";
 
