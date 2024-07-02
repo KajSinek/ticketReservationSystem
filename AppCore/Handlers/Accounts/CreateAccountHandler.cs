@@ -30,14 +30,30 @@ public class CreateAccountHandler(IBaseDbRequests baseDbRequests, ILogger<Create
             PhoneNumber = request.PhoneNumber
         };
 
-        var response = await baseDbRequests.CreateAsync(entity);
+        var accountResponse = await baseDbRequests.CreateAsync(entity);
 
-        if (response.Entity is null)
+        if (accountResponse.Entity is null || accountResponse.Entity is not Account account)
         {
             logger.LogError("Failed to create account");
-            return response;
+            return accountResponse;
         }
 
-        return response;
+        var accountBalanceEntity = new AccountBalance()
+        {
+            Id = Guid.NewGuid(),
+            AccountId = account.AccountId,
+            Value = 0
+        };
+
+        var accountBalanceResponse = await baseDbRequests.CreateAsync(accountBalanceEntity);
+        accountResponse.Entity.AccountBalance = accountBalanceResponse.Entity;
+
+        if (accountBalanceResponse is null)
+        {
+            logger.LogError("Failed to create Account Balance");
+            return accountResponse;
+        }
+
+        return accountResponse;
     }
 }
