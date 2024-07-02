@@ -1,4 +1,5 @@
-﻿using Helpers.Resources;
+﻿using Helpers.Models;
+using Helpers.Resources;
 using Helpers.Responses;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -91,6 +92,21 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
             return new EntityResponse<T>
             {
                 Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, typeof(T).ToString(), id) },
+                StatusCode = HttpStatusCode.NotFound
+            };
+        }
+
+        return new EntityResponse<T> { Entity = entity };
+    }
+
+    public async Task<EntityResponse<T>> GetEntityByPropertyAsync<T>(GetEntityByPropertyModel<T> model) where T : class
+    {
+        var entity = await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(model.Query);
+        if (entity == null)
+        {
+            return new EntityResponse<T>
+            {
+                Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, typeof(T).ToString(), model.Query) },
                 StatusCode = HttpStatusCode.NotFound
             };
         }

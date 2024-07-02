@@ -59,4 +59,16 @@ public class TestBase
             ValidityStartDate = ValidityStartDate ?? DateHelper.DateOnlyUtcNow.AddDays(1)
         };
     }
+
+    public static AccountBalance GetTestAccountBalance(Guid? id = null,
+                                                Guid? accountId = null,
+                                                decimal? value = null)
+    {
+        return new AccountBalance
+        {
+            Id = id ?? Guid.NewGuid(),
+            AccountId = accountId ?? Guid.NewGuid(),
+            Value = value ?? 0
+        };
+    }
 }
