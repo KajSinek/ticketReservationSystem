@@ -33,7 +33,9 @@ public class CreateAccountApiModelValidator : AbstractValidator<CreateAccountMod
             .NotEmpty()
             .WithMessage("Address is required")
             .Matches(".*[0-9].*")
-            .WithMessage("Address must contain a number");
+            .WithMessage("Address must contain a number")
+            .MaximumLength(60)
+            .WithMessage("Address must be less than 60 characters");
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
