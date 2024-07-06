@@ -272,6 +272,200 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_400'
+  /accounts/{account_id}/tickets:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve all tickets per account.
+      description: Retrieve all tickets per account.
+      operationId: listTicketsPerAccount
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+        - name: offset
+          in: query
+          description: >-
+            The number of items to skip before starting to collect the result
+            set. 0 = skip nothing, 10 = skip first 10 results, 20 = skip first
+            20 results.
+          schema:
+            minimum: 0
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: >-
+            The number of items to return, which can be less that the total
+            number of items.
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket_collection'
+  /accounts/{account_id}/tickets/{ticket_id}:
+    post:
+      tags:
+        - Accounts
+      summary: Add ticket for an account.
+      description: Add ticket for an account.
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      operationId: AddTicketForAccount
+      responses:
+        '201':
+          description: Ticket Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket_extended_by_account_id'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve a ticket for an account.
+      description: Retrieve ticket by ticket_id and account_id.
+      operationId: getAccountForTicket
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket_extended_by_account_id'
+        '400':
+          description: >-
+            Returns an error object containing detailed information about the
+            error. Returned when validation error occurs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+    delete:
+      tags:
+        - Accounts
+      summary: Delete a bought ticket for an account.
+      description: Delete a bought ticket for an account in the Ticket Reservation System.
+      operationId: deleteTicketForAccount
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
   /tickets:
     post:
       tags:
