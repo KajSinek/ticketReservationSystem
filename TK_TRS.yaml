@@ -1,0 +1,853 @@
+#path segments kebab-case 
+#parameters snake_case 
+#JSON properties camelCase
+openapi: 3.0.3
+info:
+  title: TRS
+  description: >-
+    The TK.Trs.Ke API is the API for the Tickets reservation system.
+  version: 0.0.1
+servers:
+  - url: xyz
+paths:
+  /accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Add account with properties into the ticket system
+      description: Add account with properties into the ticket system
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+      operationId: addAccount
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/account'
+      responses:
+        '201':
+          description: Account Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account_extended'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve all accounts.
+      description: Retrieve all accounts.
+      operationId: listAccounts
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: offset
+          in: query
+          description: >-
+            The number of items to skip before starting to collect the result
+            set. 0 = skip nothing, 10 = skip first 10 results, 20 = skip first
+            20 results.
+          schema:
+            minimum: 0
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: >-
+            The number of items to return, which can be less that the total
+            number of items.
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account_extended_collection'
+  /accounts/{account_id}:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve an account.
+      description: Retrieve account based on the account_id.
+      operationId: getAccount
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account_extended'
+        '400':
+          description: >-
+            Returns an error object containing detailed information about the
+            error. Returned when validation error occurs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+    put:
+      tags:
+        - Accounts
+      summary: Update an account.
+      description: Update the properties of an account.
+      operationId: replaceAccount
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/account'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account_extended'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_409'
+    delete:
+      tags:
+        - Accounts
+      summary: Delete an account
+      description: Delete an account in the Ticket Reservation System.
+      operationId: deleteLifecycleAccount
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+  /accounts/deposit/{account_id}:
+    post:
+      tags:
+        - Accounts
+      summary: Increase account value.
+      description: Increase value of an Account
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: account_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Account identifier
+      operationId: deposit
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/deposit'
+      responses:
+        '201':
+          description: Account Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account_extended'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+  /tickets:
+    post:
+      tags:
+        - Tickets
+      summary: Create a ticket
+      description: Create a ticket
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+      operationId: AddTicket
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/ticket'
+      responses:
+        '201':
+          description: Account Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+    get:
+      tags:
+        - Tickets
+      summary: Retrieve all tickets.
+      description: Retrieve all tickets.
+      operationId: listTickets
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: offset
+          in: query
+          description: >-
+            The number of items to skip before starting to collect the result
+            set. 0 = skip nothing, 10 = skip first 10 results, 20 = skip first
+            20 results.
+          schema:
+            minimum: 0
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: >-
+            The number of items to return, which can be less that the total
+            number of items.
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket_collection'
+  /tickets/{ticket_id}:
+    get:
+      tags:
+        - Tickets
+      summary: Retrieve a ticket.
+      description: Retrieve ticket on the ticket_id.
+      operationId: getTicket
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket'
+        '400':
+          description: >-
+            Returns an error object containing detailed information about the
+            error. Returned when validation error occurs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+    put:
+      tags:
+        - Tickets
+      summary: Update a ticket.
+      description: Update the properties of an ticket.
+      operationId: replaceTicket
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ticket'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ticket'
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_409'
+    delete:
+      tags:
+        - Tickets
+      summary: Delete a ticket
+      description: Delete a ticket in the Ticket Reservation System.
+      operationId: deleteTicket
+      parameters:
+        - name: tenant_id
+          in: header
+          description: tenant identifier
+          required: true
+          schema:
+            type: string
+            format: string
+        - name: ticket_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Ticket identifier
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: >-
+            The request cannot be processed because this is a bad request or
+            there are validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+        '404':
+          description: The resource cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+components:
+  schemas:
+    account_id:
+      type: string
+      description: The Internal id of an Account, as a UUID.
+      format: uuid
+      readOnly: true
+    ticket_id:
+      type: string
+      description: The Internal id of a Ticket, as a UUID.
+      format: uuid
+      readOnly: true
+    bought_ticket_id:
+      type: string
+      description: The Internal id of a Bought Ticket, as a UUID.
+      format: uuid
+      readOnly: true
+    basket_id:
+      type: string
+      description: The Internal id of a Basket, as a UUID.
+      format: uuid
+      readOnly: true
+    account_id_model:
+      type: string
+      description: Account id for model
+      example: "b7ad317a-019a-42af-9fe3-e29cfeef7f90"
+      nullable: false
+    ticket_id_model:
+      type: string
+      description: Account id for model
+      example: "b7ad317a-019a-42af-9fe3-e29cfeef7f90"
+      nullable: false
+    email:
+      type: string
+      description: Contact email
+      example: "testingemail@gmail.com"
+      nullable: false
+    username:
+      type: string
+      description: Username for log-in
+      example: "UserName"
+      nullable: false
+      minLength: 3
+      maxLength: 15
+    firstname:
+      type: string
+      description: Firstname of account owner
+      example: "John"
+      nullable: false
+      maxLength: 25
+    lastname:
+      type: string
+      description: Lastname of account owner
+      example: "Doe"
+      nullable: false
+      maxLength: 25
+    address:
+      type: string
+      description: Living address of account owner
+      example: "Wallstreet 7 040015 Tokio"
+      nullable: false
+      maxLength: 60
+    phone_number:
+      type: string
+      description: Contact phone number
+      example: "+421 904 312 302"
+      nullable: true
+      maxLength: 15
+    price:
+      type: number
+      description: Value
+      example: 20.5
+      nullable: true
+      minimum: 0
+    account_value:
+      type: number
+      description: Value of an Account
+      example: 20
+      nullable: false
+      minimum: 0
+    ticket_name:
+      type: string
+      example: "NameOfTicket"
+      nullable: false
+      maxLength: 15
+    validity_start_date:
+      type: string
+      example: "07/15/2025"
+      nullable: false
+    date:
+      type: string
+      example: "07/16/2025"
+      nullable: false
+
+    error_response:
+      type: object
+      properties:
+        status:
+          maximum: 600
+          minimum: 100
+          type: integer
+          description: The HTTP Status code that was sent with this error message
+        error_code:
+          type: string
+          description: Internal error code
+        message:
+          type: string
+          description: Optional basic feedback message in your language
+          nullable: true
+        link:
+          type: string
+          description: Optional hyperlink to documentation about this error
+          format: uri
+          nullable: true
+        developer_message:
+          type: string
+          description: Optional more technical error message
+          nullable: true
+        validation_messages:
+          type: array
+          description: An optional list of validation messages
+          nullable: true
+          items:
+            $ref: '#/components/schemas/validation_message'
+        correlation_id:
+          type: string
+          description: >-
+            A UUID that contains a correlationId which can be used to correlate
+            multiple errors and link this error to entries in (other) logs.
+          format: uuid
+      additionalProperties: false
+      description: Generic format for an error message
+    inline_response_400:
+      allOf:
+        - $ref: '#/components/schemas/error_response'
+        - type: object
+          example:
+            status: 400
+            error_code: 123abc
+            message: Validation Errors
+            link: https://docs.domain.com/moreInfo/123abc
+            developer_message: >-
+              The request could not be processed because there are validation
+              errors while processing the Request Body.
+            validation_messages:
+              - error_code: 456def
+                field: name
+                message: Name is required
+              - error_code: 789ghi
+                field: age
+                message: Age must be a positive number
+            correlation_id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    inline_response_404:
+      allOf:
+        - $ref: '#/components/schemas/error_response'
+        - type: object
+          example:
+            status: 404
+            error_code: 123abc
+            message: Resource Not Found
+            link: https://docs.domain.com/moreInfo/123abc
+            developer_message: >-
+              The request could not be processed because the identified resource
+              cannot be found.
+            correlation_id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    inline_response_409:
+      allOf:
+        - $ref: '#/components/schemas/error_response'
+        - type: object
+          example:
+            status: 409
+            error_code: 123abc
+            message: Conflict
+            link: https://docs.domain.com/moreInfo/123abc
+            developer_message: >-
+              The request could not be processed because it conflicts with other
+              resources.
+            correlation_id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    account:
+      type: object
+      properties:
+        email:
+          allOf:
+            - $ref: '#/components/schemas/email'
+        username:
+          allOf:
+            - $ref: '#/components/schemas/username'
+        firstname:
+          allOf:
+            - $ref: '#/components/schemas/firstname'
+        lastname:
+          allOf:
+            - $ref: '#/components/schemas/lastname'
+        address:
+          allOf:
+            - $ref: '#/components/schemas/address'
+        phone_number:
+          allOf:
+            - $ref: '#/components/schemas/phone_number'
+      description: A collection of lifecycle accounts
+    account_extended:
+      description: Detailed information about an Account in the Ticket Reservation System
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/account'
+        - type: object
+          properties:
+            account_id:
+              $ref: '#/components/schemas/account_id'
+            account_value:
+              $ref: '#/components/schemas/account_value'
+    account_extended_collection:
+      description: Collection of an Accounts
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/pagination'
+        items:
+          type: array
+          items: 
+            $ref: '#/components/schemas/account_extended'
+    deposit:
+      description: Deposit in money
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/price'
+    ticket:
+      description: Ticket
+      type: object
+      properties:
+        ticket_id:
+          $ref: '#/components/schemas/ticket_id'
+        ticket_name:
+          $ref: '#/components/schemas/ticket_name'
+        price:
+          $ref: '#/components/schemas/price'
+        expiration_date:
+          $ref: '#/components/schemas/date'
+        validity_start_date:
+          $ref: '#/components/schemas/validity_start_date'
+    ticket_collection:
+      description: Collection of Tickets
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/pagination'
+        items:
+          type: array
+          items: 
+            $ref: '#/components/schemas/ticket'
+    ticket_extended_by_account_id:
+      description: Ticket with account_id
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ticket'
+        - type: object
+          properties:
+            account_id:
+              $ref: '#/components/schemas/account_id'
+            bought_ticket_id:
+              $ref: '#/components/schemas/bought_ticket_id'
+    basket:
+      description: Basket for an Account
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/account_id_model'
+    basket_extended:
+      description: Response for base basket
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/basket'
+        - type: object
+          properties:
+            basket_id:
+              $ref: '#/components/schemas/basket_id'
+            last_edit:
+              $ref: '#/components/schemas/date'
+    basket_with_ticket:
+      description: Add ticket to basket
+      type: object
+      properties:
+        ticket_id:
+          $ref: '#/components/schemas/ticket_id_model'
+    basket_with_tickets:
+      description: Basket with tickets
+    pagination:
+      type: object
+      properties:
+        total:
+          minimum: 0
+          type: integer
+          description: The total number of items in the result
+          format: int64
+          readOnly: true
+          example: 46
+        offset:
+          type: integer
+          description: >-
+            Value of the offset. 0 = skip nothing, 10 = skip first 10 results,
+            20 = skip first 20 results.
+          format: int32
+          example: 20
+        limit:
+          type: integer
+          description: Value of limit, the max number of items returned in this result
+          format: int32
+          example: 10
+      description: >-
+        This object contains metadata about the total number of items, offset
+        and limit in the result. This is always included for paginated and/or
+        limited collections, regardless of whether the limit and/or offset are
+        specified.
+    validation_message:
+      type: object
+      properties:
+        error_code:
+          type: string
+          description: Internal error code for this validation
+        field:
+          type: string
+          description: The name of the field that failed validation
+        message:
+          type: string
+          description: Validation message for the field
+      additionalProperties: false
+      description: >-
+        Generic format for a validation error, listed in a ValidationMessages
+        array inside an error message.
+
+  parameters:
+    offset_param:
+      name: offset
+      in: query
+      description: >-
+        The number of items to skip before starting to collect the result set. 0
+        = skip nothing, 10 = skip first 10 results, 20 = skip first 20 results.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+    limit_param:
+      name: limit
+      in: query
+      description: >-
+        The number of items to return, which can be less that the total number
+        of items.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 100
+        minimum: 1
+        type: integer
+        default: 20
+  headers:
+    x_total_items:
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        description: The total number of Items for this request
