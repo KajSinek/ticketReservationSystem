@@ -7,7 +7,7 @@
     <ProjectGuid>2894aba5-d37c-49b8-a609-8a66f28f374b</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>busreservationsystem</DockerServiceName>
+    <DockerServiceName>ticketreservationsystem</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
