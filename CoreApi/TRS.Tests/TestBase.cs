@@ -38,7 +38,7 @@ public class TestBase
     {
         return new Account
         {
-            AccountId = accountId ?? Guid.NewGuid(),
+            Id = accountId ?? Guid.NewGuid(),
             Username = username ?? "test",
             Email = email ?? "test@test.com",
             FirstName = firstName ?? "John",
@@ -58,7 +58,7 @@ public class TestBase
     {
         return new Ticket
         {
-            TicketId = ticketId ?? Guid.NewGuid(),
+            Id = ticketId ?? Guid.NewGuid(),
             Name = name ?? "Test Ticket",
             Price = price ?? 10.0m,
             ExpirationDate = ExpirationDate ?? DateHelper.DateOnlyUtcNow,

@@ -29,7 +29,7 @@ public class GetTicketHandlerTests : TestBase
         var ticketId = Guid.NewGuid();
         var ticket = GetTestTicket(ticketId);
 
-        var command = new GetTicketHandlerQuery { TicketId = ticket.TicketId };
+        var command = new GetTicketHandlerQuery { TicketId = ticket.Id };
 
         var response = new EntityResponse<Ticket> { Entity = ticket };
 

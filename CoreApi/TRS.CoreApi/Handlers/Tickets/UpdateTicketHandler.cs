@@ -26,7 +26,7 @@ public class UpdateTicketHandler(
     {
         var entity = new Ticket
         {
-            TicketId = request.TicketId,
+            Id = request.TicketId,
             Name = request.Name,
             Price = request.Price,
             ExpirationDate = request.ExpirationDate,

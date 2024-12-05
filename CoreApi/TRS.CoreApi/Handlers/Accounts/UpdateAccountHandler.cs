@@ -28,7 +28,7 @@ public class UpdateAccountHandler(
     {
         var entity = new Account
         {
-            AccountId = request.AccountId,
+            Id = request.AccountId,
             Username = request.Username,
             Email = request.Email,
             FirstName = request.FirstName,

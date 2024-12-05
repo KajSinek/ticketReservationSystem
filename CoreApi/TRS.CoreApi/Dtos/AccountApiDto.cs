@@ -2,14 +2,14 @@
 
 namespace TRS.CoreApi.Dtos;
 
-public abstract class AccountApiDto(Account account)
+public class AccountApiDto
 {
-    public Guid AccountId { get; set; } = account.AccountId;
-    public string Username { get; set; } = account.Username;
-    public string Email { get; set; } = account.Email;
-    public string FirstName { get; set; } = account.FirstName;
-    public string LastName { get; set; } = account.LastName;
-    public string PhoneNumber { get; set; } = account.PhoneNumber;
-    public string Address { get; set; } = account.Address;
-    public decimal AccountBalance { get; set; } = account.AccountBalance?.Value ?? 0;
+    public Guid AccountId { get; set; }
+    public string Username { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string PhoneNumber { get; set; } = null!;
+    public string Address { get; set; } = null!;
+    public AccountBalanceApiDto? AccountBalance { get; set; }
 }

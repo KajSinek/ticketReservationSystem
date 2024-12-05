@@ -1,38 +1,35 @@
-﻿using Helpers.Models;
-using Helpers.Responses;
+﻿using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
 using TRS.CoreApi.Entities;
 
-namespace TRS.CoreApi.Handlers.Accounts;
+namespace TRS.CoreApi.Handlers.AccountBalances;
 
-public class AccountBalanceHandlerCommand : IRequest<EntityResponse<AccountBalance>>
+public class UpdateAccountBalanceHandlerCommand : IRequest<EntityResponse<AccountBalance>>
 {
     public required Guid AccountId { get; set; }
     public required decimal Value { get; set; }
 }
 
-public class AddAccountBalanceHandler(
+public class UpdateAccountBalanceHandler(
     IBaseDbRequests baseDbRequests,
-    ILogger<AddAccountBalanceHandler> logger
-) : IRequestHandler<AccountBalanceHandlerCommand, EntityResponse<AccountBalance>>
+    IMediator mediator,
+    ILogger<UpdateAccountBalanceHandler> logger
+) : IRequestHandler<UpdateAccountBalanceHandlerCommand, EntityResponse<AccountBalance>>
 {
     public async Task<EntityResponse<AccountBalance>> Handle(
-        AccountBalanceHandlerCommand request,
-        CancellationToken cancellationToken
+        UpdateAccountBalanceHandlerCommand request,
+        CancellationToken ct
     )
     {
-        var accountBalanceResponse = await baseDbRequests.GetEntityByPropertyAsync(
-            new GetEntityByPropertyModel<AccountBalance>
-            {
-                Query = x => x.AccountId == request.AccountId
-            }
-        );
+        var accountBalanceResponse = await mediator.Send(new GetAccountBalanceQuery
+        {
+            AccountId = request.AccountId
+        },
+        ct);
 
-        if (
-            accountBalanceResponse.Entity is null
-            || accountBalanceResponse.Entity is not AccountBalance accountBalance
-        )
+        if (accountBalanceResponse.Entity is null
+            || accountBalanceResponse.Entity is not AccountBalance accountBalance)
         {
             logger.LogError("Error with getting Account Balance");
             return accountBalanceResponse;

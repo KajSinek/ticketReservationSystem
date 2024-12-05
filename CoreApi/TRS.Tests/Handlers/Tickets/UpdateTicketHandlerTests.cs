@@ -31,7 +31,7 @@ public class UpdateTicketHandlerTests : TestBase
 
         var command = new UpdateTicketHandlerCommand
         {
-            TicketId = ticket.TicketId,
+            TicketId = ticket.Id,
             Name = updatedTicket.Name,
             Price = updatedTicket.Price,
             ExpirationDate = updatedTicket.ExpirationDate,
@@ -59,7 +59,7 @@ public class UpdateTicketHandlerTests : TestBase
 
         var command = new UpdateTicketHandlerCommand
         {
-            TicketId = ticket.TicketId,
+            TicketId = ticket.Id,
             Name = updatedTicket.Name,
             Price = updatedTicket.Price,
             ExpirationDate = updatedTicket.ExpirationDate,
