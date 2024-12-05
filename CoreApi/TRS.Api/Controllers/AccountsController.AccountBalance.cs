@@ -3,6 +3,7 @@ using Helpers.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TRS.CoreApi.Entities;
+using TRS.CoreApi.Handlers.AccountBalances;
 using TRS.CoreApi.Handlers.Accounts;
 using TRS.CoreApi.Models;
 
@@ -24,7 +25,7 @@ public partial class AccountsController
     )
     {
         var result = await mediator.Send(
-            new AccountBalanceHandlerCommand { AccountId = account_id, Value = model.Value },
+            new GetAccountBalanceQuery { AccountId = account_id},
             ct
         );
 

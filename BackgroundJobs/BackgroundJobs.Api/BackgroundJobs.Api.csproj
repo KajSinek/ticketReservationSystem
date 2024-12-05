@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Abstractions\Abstractions.csproj" />
+    <ProjectReference Include="..\..\EntityFrameworkCore\EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\Helpers\Helpers.csproj" />
     <ProjectReference Include="..\BackgroundJobs.Core\BackgroundJobs.Core.csproj" />
   </ItemGroup>
 

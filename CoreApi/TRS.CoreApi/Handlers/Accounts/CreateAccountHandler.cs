@@ -2,6 +2,7 @@
 using Helpers.Services;
 using MediatR;
 using TRS.CoreApi.Entities;
+using TRS.CoreApi.Handlers.AccountBalances;
 
 namespace TRS.CoreApi.Handlers.Accounts;
 
@@ -17,17 +18,18 @@ public class CreateAccountHandlerCommand : IRequest<EntityResponse<Account>>
 
 public class CreateAccountHandler(
     IBaseDbRequests baseDbRequests,
+    IMediator mediator,
     ILogger<CreateAccountHandler> logger
 ) : IRequestHandler<CreateAccountHandlerCommand, EntityResponse<Account>>
 {
     public async Task<EntityResponse<Account>> Handle(
         CreateAccountHandlerCommand request,
-        CancellationToken cancellationToken
+        CancellationToken ct
     )
     {
         var entity = new Account
         {
-            AccountId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Username = request.Username,
             Email = request.Email,
             FirstName = request.FirstName,
@@ -44,22 +46,27 @@ public class CreateAccountHandler(
             return accountResponse;
         }
 
-        var accountBalanceEntity = new AccountBalance()
+        var accountBalanceResponse = await mediator.Send(new CreateAccountBalanceCommand
         {
-            Id = Guid.NewGuid(),
-            AccountId = account.AccountId,
-            Value = 0
-        };
+            AccountId = account.Id
+        }, ct);
 
-        var accountBalanceResponse = await baseDbRequests.CreateAsync(accountBalanceEntity);
-        accountResponse.Entity.AccountBalance = accountBalanceResponse.Entity;
-
-        if (accountBalanceResponse is null)
+        if (accountBalanceResponse.Entity is null || accountBalanceResponse.Entity is not AccountBalance accountBalance)
         {
             logger.LogError("Failed to create Account Balance");
             return accountResponse;
         }
 
-        return accountResponse;
+        account.AccountBalance = accountBalance;
+
+        var updateAccountResponse = await baseDbRequests.UpdateAsync(account.Id, account);
+
+        if (updateAccountResponse.Entity is null)
+        {
+            logger.LogError("Failed to update account");
+            return updateAccountResponse;
+        }
+
+        return updateAccountResponse;
     }
 }

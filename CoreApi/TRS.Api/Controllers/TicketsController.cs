@@ -42,7 +42,7 @@ public class TicketsController(IMediator mediator) : ControllerBase
 
         return CreatedAtRoute(
             GetTicketRouteName,
-            routeValues: new { ticket_id = result.Entity.TicketId },
+            routeValues: new { ticket_id = result.Entity.Id },
             value: result
         );
     }

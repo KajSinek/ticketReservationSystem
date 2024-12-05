@@ -10,12 +10,12 @@ namespace HomeApp.ApiCore.Database
         public AppDbContext CreateDbContext(string[] args)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BackgroundJobs.Api"))
-                .AddJsonFile("appsettingsApp.json")
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../TRS.Api"))
+                .AddJsonFile("appsettings.json")
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();
-            var connectionString = configuration.GetConnectionString("HangfireConnection");
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             builder.UseNpgsql(connectionString);
 

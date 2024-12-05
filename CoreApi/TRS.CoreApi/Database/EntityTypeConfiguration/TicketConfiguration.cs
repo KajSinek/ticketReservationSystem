@@ -12,7 +12,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
     public void Configure(EntityTypeBuilder<Ticket> builder)
     {
         builder.ToTable("Tickets");
-        builder.HasKey(x => x.TicketId);
+        builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Name).IsRequired();
 
@@ -26,5 +26,10 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.Property(x => x.ExpirationDate).IsRequired();
 
         builder.Property(x => x.ValidityStartDate).IsRequired();
+
+        builder.HasMany(x => x.AccountBasketTickets)
+            .WithOne(x => x.Ticket)
+            .HasForeignKey(x => x.TicketId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

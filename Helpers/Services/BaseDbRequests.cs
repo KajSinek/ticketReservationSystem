@@ -73,25 +73,43 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
         });
     }
 
-    public async Task<EntityResponse<T>> GetAsync<T>(Guid id) where T : class
+    public async Task<EntityResponse<T>> GetAsync<T>(object keyValues) where T : class
     {
         var entityType = typeof(T);
-        var primaryKeyProperty = _context.Model.FindEntityType(entityType).FindPrimaryKey().Properties.FirstOrDefault();
-        if (primaryKeyProperty == null)
+        var primaryKeyProperties = _context.Model.FindEntityType(entityType).FindPrimaryKey().Properties;
+
+        if (!primaryKeyProperties.Any())
         {
             throw new InvalidOperationException($"Entity type {entityType.Name} does not have a primary key");
         }
 
+        // Ensure the keyValues argument is valid
+        var keyValuesArray = keyValues as object[];
+        if (primaryKeyProperties.Count > 1 && (keyValuesArray == null || keyValuesArray.Length != primaryKeyProperties.Count))
+        {
+            throw new ArgumentException($"Invalid key values for composite primary key of {entityType.Name}");
+        }
+
+        // Build the filter expression dynamically for composite or single key
         var parameter = Expression.Parameter(entityType, "e");
-        var propertyAccess = Expression.MakeMemberAccess(parameter, primaryKeyProperty.PropertyInfo);
-        var filter = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(id)), parameter);
+        Expression combinedFilter = null;
+
+        for (int i = 0; i < primaryKeyProperties.Count; i++)
+        {
+            var propertyAccess = Expression.MakeMemberAccess(parameter, primaryKeyProperties[i].PropertyInfo);
+            var keyValue = primaryKeyProperties.Count == 1 ? keyValues : keyValuesArray[i];
+            var equality = Expression.Equal(propertyAccess, Expression.Constant(keyValue));
+            combinedFilter = combinedFilter == null ? equality : Expression.AndAlso(combinedFilter, equality);
+        }
+
+        var filter = Expression.Lambda<Func<T, bool>>(combinedFilter, parameter);
 
         var entity = await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(filter);
         if (entity == null)
         {
             return new EntityResponse<T>
             {
-                Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, typeof(T).ToString(), id) },
+                Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, typeof(T).ToString(), string.Join(", ", keyValuesArray ?? new[] { keyValues })) },
                 StatusCode = HttpStatusCode.NotFound
             };
         }

@@ -12,6 +12,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - postgres
+      - backgroundjobs
     networks:
       - trs-network
   postgres:

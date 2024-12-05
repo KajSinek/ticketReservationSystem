@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TRS.CoreApi.Entities;
 using TRS.CoreApi.Handlers.Accounts;
+using TRS.CoreApi.Mapping;
 using TRS.CoreApi.Models;
 
 namespace BusReservationSystem.Controllers;
@@ -44,8 +45,8 @@ public partial class AccountsController(IMediator mediator) : ControllerBase
 
         return CreatedAtRoute(
             GetAccountRouteName,
-            routeValues: new { account_id = result.Entity.AccountId },
-            value: result
+            routeValues: new { account_id = result.Entity.Id },
+            value: result.Entity.ToAccountApiDto()
         );
     }
 

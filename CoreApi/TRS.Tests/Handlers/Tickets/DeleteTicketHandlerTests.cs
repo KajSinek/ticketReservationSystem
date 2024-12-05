@@ -25,7 +25,7 @@ public class DeleteTicketHandlerTests : TestBase
         var ticketId = Guid.NewGuid();
         var ticket = GetTestTicket(ticketId);
 
-        var command = new DeleteTicketHandlerCommand { TicketId = ticket.TicketId };
+        var command = new DeleteTicketHandlerCommand { TicketId = ticket.Id };
 
         var response = new Response { Errors = new List<string>() };
 
@@ -45,7 +45,7 @@ public class DeleteTicketHandlerTests : TestBase
         var ticketId = Guid.NewGuid();
         var ticket = GetTestTicket(ticketId);
 
-        var command = new DeleteTicketHandlerCommand { TicketId = ticket.TicketId };
+        var command = new DeleteTicketHandlerCommand { TicketId = ticket.Id };
 
         var response = new Response { Errors = new List<string> { "Error" } };
 

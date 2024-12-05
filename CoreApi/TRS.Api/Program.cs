@@ -1,7 +1,11 @@
 using Helpers.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using TRS.CoreApi.Database;
 using TRS.CoreApi.Extensions;
+using BackgroundJobs.Api;
+using Refit;
+using TRS.CoreApi.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +22,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped(typeof(IBaseDbRequests), typeof(BaseDbRequests<AppDbContext>));
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+// Add Hangfire services from the BackgroundJobs project
+builder.Services.AddCustomServices();
+
+builder.Services.AddRefitClient<IBackgroundJobCall>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://backgroundjobs:5000"));
 
 builder.AddCustomApplicationComponents();
 
