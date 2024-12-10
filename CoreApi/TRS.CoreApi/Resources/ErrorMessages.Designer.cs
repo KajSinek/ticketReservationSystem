@@ -88,6 +88,15 @@ namespace TRS.CoreApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account with ID &apos;{0}&apos; has not enough money.
+        /// </summary>
+        public static string eAccountHasNotEnoughMoney {
+            get {
+                return ResourceManager.GetString("eAccountHasNotEnoughMoney", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entity &apos;{0}&apos; with ID &apos;{1}&apos; Not Found.
         /// </summary>
         public static string EntityNotFound {

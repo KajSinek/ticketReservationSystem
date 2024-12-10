@@ -1,6 +1,7 @@
 ﻿using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TRS.CoreApi.Entities;
 
 namespace TRS.CoreApi.Handlers.Accounts;
@@ -37,7 +38,7 @@ public class UpdateAccountHandler(
             PhoneNumber = request.PhoneNumber
         };
 
-        var response = await baseDbRequests.UpdateAsync(request.AccountId, entity);
+        var response = await baseDbRequests.UpdateAsync(request.AccountId, entity, query => query.Include(a => a.AccountBalance));
 
         if (response.Entity is null)
         {

@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using TRS.CoreApi.Entities;
+using TRS.CoreApi.Enums;
 using TRS.CoreApi.Handlers.AccountBalances;
 
 namespace TRS.Tests.Handlers.Accounts;
@@ -32,7 +33,7 @@ public class AddAccountBalanceHandlerTests : TestBase
         var accountBalanceId = Guid.NewGuid();
         var accountBalance = GetTestAccountBalance(id: accountBalanceId, accountId: accountId);
 
-        var request = new UpdateAccountBalanceHandlerCommand { AccountId = accountId, Value = 100 };
+        var request = new UpdateAccountBalanceCommand { AccountId = accountId, Value = 100, Type = AccountBalanceType.Add };
 
         var accountBalanceResponse = new EntityResponse<AccountBalance> { Entity = accountBalance };
 
@@ -67,7 +68,7 @@ public class AddAccountBalanceHandlerTests : TestBase
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var request = new UpdateAccountBalanceHandlerCommand { AccountId = accountId, Value = 100 };
+        var request = new UpdateAccountBalanceCommand { AccountId = accountId, Value = 100, Type = AccountBalanceType.Sub };
 
         var accountBalanceResponse = new EntityResponse<AccountBalance> { Entity = null };
 
@@ -90,7 +91,7 @@ public class AddAccountBalanceHandlerTests : TestBase
         var accountBalanceId = Guid.NewGuid();
         var accountBalance = GetTestAccountBalance(id: accountBalanceId, accountId: accountId);
 
-        var request = new UpdateAccountBalanceHandlerCommand { AccountId = accountId, Value = 100 };
+        var request = new UpdateAccountBalanceCommand { AccountId = accountId, Value = 100, Type = AccountBalanceType.Add };
 
         var accountBalanceResponse = new EntityResponse<AccountBalance> { Entity = accountBalance };
 

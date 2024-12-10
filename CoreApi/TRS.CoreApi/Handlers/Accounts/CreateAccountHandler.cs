@@ -57,15 +57,15 @@ public class CreateAccountHandler(
             return accountResponse;
         }
 
-        account.AccountBalance = accountBalance;
-
         var updateAccountResponse = await baseDbRequests.UpdateAsync(account.Id, account);
 
-        if (updateAccountResponse.Entity is null)
+        if (updateAccountResponse.IsFailure || updateAccountResponse.Entity is not Account updatedAccount)
         {
             logger.LogError("Failed to update account");
             return updateAccountResponse;
         }
+
+        updatedAccount.AccountBalance = accountBalance;
 
         return updateAccountResponse;
     }

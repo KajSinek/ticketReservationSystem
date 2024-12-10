@@ -1,6 +1,7 @@
 ﻿using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TRS.CoreApi.Entities;
 
 namespace TRS.CoreApi.Handlers.Accounts;
@@ -18,7 +19,7 @@ public class GetAccountHandler(IBaseDbRequests baseDbRequests, ILogger<GetAccoun
         CancellationToken cancellationToken
     )
     {
-        var data = await baseDbRequests.GetAsync<Account>(request.AccountId);
+        var data = await baseDbRequests.GetAsync<Account>(request.AccountId, query => query.Include(x => x.AccountBalance));
 
         if (data.Entity is null)
         {

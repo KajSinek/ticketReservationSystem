@@ -126,6 +126,9 @@
   <data name="AccountUsernameConflict" xml:space="preserve">
     <value>Account with Username '{0}' already exists</value>
   </data>
+  <data name="eAccountHasNotEnoughMoney" xml:space="preserve">
+    <value>Account with ID '{0}' has not enough money</value>
+  </data>
   <data name="EntityNotFound" xml:space="preserve">
     <value>Entity '{0}' with ID '{1}' Not Found</value>
   </data>

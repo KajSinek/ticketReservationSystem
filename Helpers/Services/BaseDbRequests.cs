@@ -34,24 +34,62 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
         };
     }
 
-    public async Task<EntityResponse<T>> UpdateAsync<T>(Guid id, T entity) where T : class
+    public async Task<EntityResponse<T>> UpdateAsync<T>(
+    Guid id,
+    T entity,
+    Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
     {
-        var foundEntity = GetAsync<T>(id);
-        if (foundEntity.Result.Errors.Count > 0)
-            return foundEntity.Result;
-        var data = _context.Set<T>().Update(entity);
-        if (!entity.Equals(foundEntity.Result.Entity))
-            await _context.SaveChangesAsync();
+        // Fetch the entity using query configurator
+        var query = _context.Set<T>().AsQueryable();
+        if (queryConfigurator != null)
+        {
+            query = queryConfigurator(query); // Apply includes or other query configurations
+        }
+
+        var foundEntity = await query.FirstOrDefaultAsync(e =>
+            EF.Property<Guid>(e, "Id") == id); // Replace "Id" with the actual primary key property if different
+
+        if (foundEntity == null)
+        {
+            return new EntityResponse<T>
+            {
+                Errors = new List<string> { "Entity not found." },
+                StatusCode = HttpStatusCode.NotFound
+            };
+        }
+
+        // Update the entity
+        _context.Entry(foundEntity).CurrentValues.SetValues(entity);
+        await _context.SaveChangesAsync();
+
+        // Re-fetch the updated entity with the query configurator applied
+        var updatedQuery = _context.Set<T>().AsNoTracking(); // No tracking for the response
+        if (queryConfigurator != null)
+        {
+            updatedQuery = queryConfigurator(updatedQuery); // Reapply the includes
+        }
+
+        var updatedEntity = await updatedQuery.FirstOrDefaultAsync(e =>
+            EF.Property<Guid>(e, "Id") == id); // Replace "Id" with your primary key property name
+
+        if (updatedEntity == null)
+        {
+            return new EntityResponse<T>
+            {
+                Errors = new List<string> { "Updated entity could not be retrieved." },
+                StatusCode = HttpStatusCode.NotFound
+            };
+        }
 
         return new EntityResponse<T>
         {
-            Entity = data.Entity
+            Entity = updatedEntity
         };
     }
 
-    public Task<Response> DeleteAsync<T>(Guid id) where T : class
+    public Task<Response> DeleteAsync<T>(Guid id, Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
     {
-        var data = GetAsync<T>(id);
+        var data = GetAsync<T>(id, queryConfigurator);
         var response = new Response();
         if (data.Result.Entity == null)
         {
@@ -64,16 +102,32 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
         return Task.FromResult(response);
     }
 
-    public Task<EntitiesResponse<T>> GetAllAsync<T>() where T : class
+    public async Task<EntitiesResponse<T>> GetAllAsync<T>(
+    Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
     {
-        var data = _context.Set<T>().ToList();
-        return Task.FromResult(new EntitiesResponse<T>
+        // Start with the base query
+        IQueryable<T> query = _context.Set<T>().AsNoTracking();
+
+        // Apply the query configurator if provided
+        if (queryConfigurator != null)
+        {
+            query = queryConfigurator(query);
+        }
+
+        // Execute the query and fetch the data
+        var data = await query.ToListAsync();
+
+        // Return the response
+        return new EntitiesResponse<T>
         {
             Entities = data
-        });
+        };
     }
 
-    public async Task<EntityResponse<T>> GetAsync<T>(object keyValues) where T : class
+
+    public async Task<EntityResponse<T>> GetAsync<T>(
+    object keyValues,
+    Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
     {
         var entityType = typeof(T);
         var primaryKeyProperties = _context.Model.FindEntityType(entityType).FindPrimaryKey().Properties;
@@ -104,7 +158,14 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
 
         var filter = Expression.Lambda<Func<T, bool>>(combinedFilter, parameter);
 
-        var entity = await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(filter);
+        // Apply the query configuration if provided
+        IQueryable<T> query = _context.Set<T>().AsNoTracking();
+        if (queryConfigurator != null)
+        {
+            query = queryConfigurator(query);
+        }
+
+        var entity = await query.FirstOrDefaultAsync(filter);
         if (entity == null)
         {
             return new EntityResponse<T>
@@ -116,6 +177,7 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
 
         return new EntityResponse<T> { Entity = entity };
     }
+
 
     public async Task<EntityResponse<T>> GetEntityByPropertyAsync<T>(GetEntityByPropertyModel<T> model) where T : class
     {
