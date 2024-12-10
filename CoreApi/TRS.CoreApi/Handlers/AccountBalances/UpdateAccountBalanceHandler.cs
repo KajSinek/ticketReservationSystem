@@ -2,23 +2,26 @@
 using Helpers.Services;
 using MediatR;
 using TRS.CoreApi.Entities;
+using TRS.CoreApi.Enums;
+using TRS.CoreApi.Resources;
 
 namespace TRS.CoreApi.Handlers.AccountBalances;
 
-public class UpdateAccountBalanceHandlerCommand : IRequest<EntityResponse<AccountBalance>>
+public class UpdateAccountBalanceCommand : IRequest<EntityResponse<AccountBalance>>
 {
     public required Guid AccountId { get; set; }
     public required decimal Value { get; set; }
+    public required AccountBalanceType Type { get; set; }
 }
 
 public class UpdateAccountBalanceHandler(
     IBaseDbRequests baseDbRequests,
     IMediator mediator,
     ILogger<UpdateAccountBalanceHandler> logger
-) : IRequestHandler<UpdateAccountBalanceHandlerCommand, EntityResponse<AccountBalance>>
+) : IRequestHandler<UpdateAccountBalanceCommand, EntityResponse<AccountBalance>>
 {
     public async Task<EntityResponse<AccountBalance>> Handle(
-        UpdateAccountBalanceHandlerCommand request,
+        UpdateAccountBalanceCommand request,
         CancellationToken ct
     )
     {
@@ -39,8 +42,34 @@ public class UpdateAccountBalanceHandler(
         {
             Id = accountBalance.Id,
             AccountId = request.AccountId,
-            Value = accountBalance.Value + request.Value
+            Value = default
         };
+
+        if (request.Value > accountBalance.Value && request.Type == AccountBalanceType.Sub)
+        {
+            logger.LogError(string.Format(ErrorMessages.eAccountHasNotEnoughMoney, request.AccountId));
+            return new EntityResponse<AccountBalance>
+            {
+                Errors =
+                [
+                    string.Format(ErrorMessages.eAccountHasNotEnoughMoney, request.AccountId) 
+                ] 
+            };
+        }
+
+        switch (request.Type)
+        {
+            case AccountBalanceType.Add: 
+                entity.Value = accountBalance.Value + request.Value;
+                break;
+            case AccountBalanceType.Sub:
+                entity.Value = accountBalance.Value - request.Value;
+                break;
+            default:
+                entity.Value = accountBalance.Value;
+                break;
+        }
+
 
         var response = await baseDbRequests.UpdateAsync(accountBalance.Id, entity);
 

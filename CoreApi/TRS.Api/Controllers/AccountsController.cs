@@ -40,13 +40,13 @@ public partial class AccountsController(IMediator mediator) : ControllerBase
             ct
         );
 
-        if (result.IsFailure || result.Entity is null)
+        if (result.IsFailure || result.Entity is not Account account)
             return StatusCode((int)result.StatusCode, result);
 
         return CreatedAtRoute(
             GetAccountRouteName,
             routeValues: new { account_id = result.Entity.Id },
-            value: result.Entity.ToAccountApiDto()
+            value: account.ToAccountApiDto()
         );
     }
 
@@ -58,7 +58,10 @@ public partial class AccountsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetAccountsAsync(CancellationToken ct)
     {
         var result = await mediator.Send(new GetAccountsHandlerQuery { }, ct);
-        return Ok(result);
+        if (result.IsFailure || result.Entities is not List<Account> accounts)
+            return StatusCode((int)result.StatusCode, result);
+
+        return Ok(accounts.ToCollectionDto(item => item.ToAccountApiDto()));
     }
 
     [HttpGet]
@@ -75,10 +78,10 @@ public partial class AccountsController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new GetAccountHandlerQuery { AccountId = account_id }, ct);
 
-        if (result.IsFailure || result.Entity is null)
+        if (result.IsFailure || result.Entity is not Account account)
             return StatusCode((int)result.StatusCode, result);
 
-        return Ok(result);
+        return Ok(account.ToAccountApiDto());
     }
 
     [HttpDelete]
@@ -131,9 +134,9 @@ public partial class AccountsController(IMediator mediator) : ControllerBase
             ct
         );
 
-        if (result.IsFailure || result.Entity is null)
+        if (result.IsFailure || result.Entity is not Account account)
             return StatusCode((int)result.StatusCode, result);
 
-        return Ok(result);
+        return Ok(account.ToAccountApiDto());
     }
 }

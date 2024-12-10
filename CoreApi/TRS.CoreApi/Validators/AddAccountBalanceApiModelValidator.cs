@@ -3,7 +3,7 @@ using TRS.CoreApi.Models;
 
 namespace TRS.CoreApi.Validators;
 
-public class AddAccountBalanceApiModelValidator : AbstractValidator<AddAccountBalanceModel>
+public class AddAccountBalanceApiModelValidator : AbstractValidator<UpdateAccountBalanceModel>
 {
     public AddAccountBalanceApiModelValidator()
     {
