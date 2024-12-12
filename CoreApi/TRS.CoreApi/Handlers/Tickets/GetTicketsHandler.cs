@@ -15,8 +15,8 @@ public class GetTicketsHandler(IBaseDbRequests baseDbRequests)
         CancellationToken ct
     )
     {
-        var response = await baseDbRequests.GetAllAsync<Ticket>();
+        var ticketResponse = await baseDbRequests.GetAllAsync<Ticket>();
 
-        return response;
+        return ticketResponse;
     }
 }

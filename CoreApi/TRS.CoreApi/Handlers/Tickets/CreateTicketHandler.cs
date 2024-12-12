@@ -34,12 +34,12 @@ public class CreateTicketHandler(
             ValidityStartDate = request.ValidityStartDate
         };
 
-        var response = await baseDbRequests.CreateAsync(entity);
+        var ticketResponse = await baseDbRequests.CreateAsync(entity);
 
-        if (response.Entity is null)
+        if (ticketResponse.Entity is null)
         {
             logger.LogError("Failed to create Ticket");
-            return response;
+            return ticketResponse;
         }
 
         try
@@ -56,6 +56,6 @@ public class CreateTicketHandler(
             logger.LogError($"Failed to call background job API: {ex.Message}");
         }
 
-        return response;
+        return ticketResponse;
     }
 }

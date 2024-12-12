@@ -17,8 +17,8 @@ public class DeleteTicketHandler(IBaseDbRequests baseDbRequests)
         CancellationToken cancellationToken
     )
     {
-        var response = await baseDbRequests.DeleteAsync<Ticket>(request.TicketId);
+        var ticketResponse = await baseDbRequests.DeleteAsync<Ticket>(request.TicketId);
 
-        return response;
+        return ticketResponse;
     }
 }

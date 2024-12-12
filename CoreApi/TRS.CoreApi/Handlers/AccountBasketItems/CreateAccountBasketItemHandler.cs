@@ -21,7 +21,7 @@ public class CreateAccountBasketItemHandler (IBaseDbRequests baseRequest,
         CancellationToken cancellationToken
     )
     {
-        /*var accountResponse = await baseRequest.GetAsync<Account>(request.AccountId);
+        var accountResponse = await baseRequest.GetAsync<Account>(request.AccountId);
         if (accountResponse.Entity is null || accountResponse.Entity is not Account account)
         {
             logger.LogError("Account does not exist");

@@ -3,6 +3,7 @@ using Helpers.Services;
 using MediatR;
 using TRS.CoreApi.Entities;
 using TRS.CoreApi.Handlers.AccountBalances;
+using TRS.CoreApi.Handlers.AccountBaskets;
 
 namespace TRS.CoreApi.Handlers.Accounts;
 
@@ -54,7 +55,7 @@ public class CreateAccountHandler(
         if (accountBalanceResponse.Entity is null || accountBalanceResponse.Entity is not AccountBalance accountBalance)
         {
             logger.LogError("Failed to create Account Balance");
-            return accountResponse;
+            return new EntityResponse<Account> { Errors = accountBalanceResponse.Errors };
         }
 
         var updateAccountResponse = await baseDbRequests.UpdateAsync(account.Id, account);
@@ -62,10 +63,22 @@ public class CreateAccountHandler(
         if (updateAccountResponse.IsFailure || updateAccountResponse.Entity is not Account updatedAccount)
         {
             logger.LogError("Failed to update account");
-            return updateAccountResponse;
+            return new EntityResponse<Account> { Errors = updateAccountResponse.Errors };
         }
 
-        updatedAccount.AccountBalance = accountBalance;
+        var createAccountBasketResponse = await mediator.Send(new CreateAccountBasketCommand
+        {
+            AccountId = updatedAccount.Id
+        }, ct);
+
+        if (createAccountBasketResponse.Entity is null || createAccountBasketResponse.Entity is not AccountBasket accountBasket)
+        {
+            logger.LogError("Failed to create Account Basket");
+            return new EntityResponse<Account> { Errors = createAccountBasketResponse.Errors };
+        }
+
+        updateAccountResponse.Entity.AccountBalance = accountBalance;
+        updateAccountResponse.Entity.AccountBasket = accountBasket;
 
         return updateAccountResponse;
     }
