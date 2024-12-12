@@ -19,14 +19,14 @@ public class GetAccountHandler(IBaseDbRequests baseDbRequests, ILogger<GetAccoun
         CancellationToken cancellationToken
     )
     {
-        var data = await baseDbRequests.GetAsync<Account>(request.AccountId, query => query.Include(x => x.AccountBalance));
+        var accountResponse = await baseDbRequests.GetAsync<Account>(request.AccountId, query => query.Include(x => x.AccountBalance));
 
-        if (data.Entity is null)
+        if (accountResponse.Entity is null)
         {
             logger.LogError("Failed to get Account");
-            return data;
+            return accountResponse;
         }
 
-        return data;
+        return accountResponse;
     }
 }

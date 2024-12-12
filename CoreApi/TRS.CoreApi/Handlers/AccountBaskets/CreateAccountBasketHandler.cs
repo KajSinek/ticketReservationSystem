@@ -2,7 +2,9 @@
 using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using TRS.CoreApi.Entities;
+using TRS.CoreApi.Handlers.Accounts;
 
 namespace TRS.CoreApi.Handlers.AccountBaskets;
 
@@ -11,21 +13,22 @@ public class CreateAccountBasketCommand : IRequest<EntityResponse<AccountBasket>
     public required Guid AccountId { get; set; }
 }
 
-public class CreateAccountBasketHandler(IBaseDbRequests baseDbRequests, ILogger<AccountBasket> logger)
+public class CreateAccountBasketHandler(IBaseDbRequests baseDbRequests, IMediator mediator, ILogger<AccountBasket> logger)
     : IRequestHandler<CreateAccountBasketCommand, EntityResponse<AccountBasket>>
 {
     public async Task<EntityResponse<AccountBasket>> Handle(
         CreateAccountBasketCommand request,
-        CancellationToken cancellationToken
+        CancellationToken ct
     )
     {
-        var accountResponse = await baseDbRequests.GetAsync<Account>(request.AccountId);
-        if (accountResponse.Entity is null || accountResponse.Entity is not Account account)
+        var accountResponse = await mediator.Send(new GetAccountHandlerQuery { AccountId = request.AccountId }, ct);
+        if (accountResponse.Entity is null)
         {
-            logger.LogError("Account does not exist");
+            logger.LogError("Error with getting Account.");
             return new EntityResponse<AccountBasket>
             {
-                Errors = [string.Format(ErrorMessages.EntityNotFound, nameof(Account), request.AccountId)]
+                Errors = accountResponse.Errors,
+                StatusCode = accountResponse.StatusCode
             };
         }
 

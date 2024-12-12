@@ -71,14 +71,14 @@ public class UpdateAccountBalanceHandler(
         }
 
 
-        var response = await baseDbRequests.UpdateAsync(accountBalance.Id, entity);
+        var updatedAccountBalanceResponse = await baseDbRequests.UpdateAsync(accountBalance.Id, entity);
 
-        if (response.Entity is null)
+        if (updatedAccountBalanceResponse.Entity is null)
         {
             logger.LogError("Failed to update Account Balance");
-            return response;
+            return updatedAccountBalanceResponse;
         }
 
-        return response;
+        return updatedAccountBalanceResponse;
     }
 }

@@ -18,14 +18,14 @@ public class GetTicketHandler(IBaseDbRequests baseDbRequest, ILogger<GetTicketHa
         CancellationToken cancellationToken
     )
     {
-        var response = await baseDbRequest.GetAsync<Ticket>(request.TicketId);
+        var ticketResponse = await baseDbRequest.GetAsync<Ticket>(request.TicketId);
 
-        if (response.Entity is null)
+        if (ticketResponse.Entity is null)
         {
             logger.LogError("Failed to get Ticket");
-            return response;
+            return ticketResponse;
         }
 
-        return response;
+        return ticketResponse;
     }
 }

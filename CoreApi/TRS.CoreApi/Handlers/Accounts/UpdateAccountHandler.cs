@@ -38,14 +38,14 @@ public class UpdateAccountHandler(
             PhoneNumber = request.PhoneNumber
         };
 
-        var response = await baseDbRequests.UpdateAsync(request.AccountId, entity, query => query.Include(a => a.AccountBalance));
+        var accountResponse = await baseDbRequests.UpdateAsync(request.AccountId, entity, query => query.Include(a => a.AccountBalance));
 
-        if (response.Entity is null)
+        if (accountResponse.Entity is null)
         {
             logger.LogError("Failed to update Account");
-            return response;
+            return accountResponse;
         }
 
-        return response;
+        return accountResponse;
     }
 }
