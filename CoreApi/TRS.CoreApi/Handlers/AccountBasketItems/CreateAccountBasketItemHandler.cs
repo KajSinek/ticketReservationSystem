@@ -2,30 +2,35 @@
 using Helpers.Responses;
 using Helpers.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TRS.CoreApi.Entities;
 
 namespace TRS.CoreApi.Handlers.AccountBasketItems;
 
-public class  CreateAccountBasketItemCommand : IRequest<EntityResponse<AccountBasket>>
+public class  CreateAccountBasketItemCommand : IRequest<EntityResponse<AccountBasketTicket>>
 {
     public required Guid AccountId { get; set; }
     public required Guid TicketId { get; set; }
     public required int Amount { get; set; }
 }
 
-public class CreateAccountBasketItemHandler (IBaseDbRequests baseRequest,
+public class CreateAccountBasketItemHandler(IBaseDbRequests baseRequest,
                                              ILogger<CreateAccountBasketItemHandler> logger)
 {
-    public async Task<EntityResponse<AccountBasket>> Handle(
+    public async Task<EntityResponse<AccountBasketTicket>> Handle(
         CreateAccountBasketItemCommand request,
         CancellationToken cancellationToken
     )
     {
-        var accountResponse = await baseRequest.GetAsync<Account>(request.AccountId);
-        if (accountResponse.Entity is null || accountResponse.Entity is not Account account)
+        var accountResponse = await baseRequest.GetAsync<Account>(
+            request.AccountId, 
+            query => query.Include(ab => ab.AccountBalance)
+                            .Include(ab => ab.AccountBasket)
+            );
+        if (accountResponse.Entity is null || accountResponse.Entity is not Account account || account.AccountBasket is not AccountBasket accountBasket)
         {
             logger.LogError("Account does not exist");
-            return new EntityResponse<AccountBasket>
+            return new EntityResponse<AccountBasketTicket>
             {
                 Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, nameof(Account), request.AccountId) }
             };
@@ -35,30 +40,27 @@ public class CreateAccountBasketItemHandler (IBaseDbRequests baseRequest,
         if (ticketResponse.Entity is null || ticketResponse.Entity is not Ticket ticket)
         {
             logger.LogError("Ticket does not exist");
-            return new EntityResponse<AccountBasket>
+            return new EntityResponse<AccountBasketTicket>
             {
                 Errors = new List<string> { string.Format(ErrorMessages.EntityNotFound, nameof(Ticket), request.TicketId) }
             };
         }
 
-        var accountBasketResponse = await baseRequest.GetAsync<AccountBasket>(new object[] { account.AccountId, ticket.TicketId });
-
-        var entity = new AccountBasket
+        var entity = new AccountBasketTicket
         {
-            AccountId = request.AccountId,
+            AccountBasketId = accountBasket.Id,
             TicketId = request.TicketId,
             Amount = request.Amount,
-            Account = account,
             Ticket = ticket,
             CreatedOn = DateTime.Now
         };
-        var response = await baseRequest.CreateAsync(entity);
-        if (response.Entity is null || response.Entity is not AccountBasket accountBasketItem)
+
+        var accountBasketTicketResponse = await baseRequest.CreateAsync(entity);
+        if (accountBasketTicketResponse.Entity is null || accountBasketTicketResponse.Entity is not AccountBasketTicket accountBasketTicket)
         {
             logger.LogError("Failed to create Account Basket Item");
-            return response;
+            return accountBasketTicketResponse;
         }
-        return response;*/
-        return new EntityResponse<AccountBasket>();
+        return accountBasketTicketResponse;
     }
 }
