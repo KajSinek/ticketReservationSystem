@@ -1,8 +1,7 @@
-﻿using Helpers.Resources;
-using Helpers.Responses;
+﻿using Helpers.Responses;
 using Helpers.Services;
+using Helpers.Utilities;
 using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
 using TRS.CoreApi.Entities;
 using TRS.CoreApi.Handlers.Accounts;
 
@@ -36,7 +35,7 @@ public class CreateAccountBasketHandler(IBaseDbRequests baseDbRequests, IMediato
         {
             Id = Guid.NewGuid(),
             AccountId = request.AccountId,
-            CreatedOn = DateTime.Now
+            CreatedOn = DateHelper.DateTimeUtcNow
         };
 
         var response = await baseDbRequests.CreateAsync(entity);

@@ -41,7 +41,7 @@ public class UpdateAccountHandlerTests : TestBase
 
         var response = new EntityResponse<Account> { Entity = updatedAccount };
 
-        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Account>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Account>(), Arg.Any<Guid>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -73,7 +73,7 @@ public class UpdateAccountHandlerTests : TestBase
 
         var response = new EntityResponse<Account> { Entity = null };
 
-        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Account>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Account>(), Arg.Any<Guid>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

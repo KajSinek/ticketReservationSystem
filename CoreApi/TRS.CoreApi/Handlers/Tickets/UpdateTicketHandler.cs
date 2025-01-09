@@ -33,7 +33,7 @@ public class UpdateTicketHandler(
             ValidityStartDate = request.ValidityStartDate
         };
 
-        var ticketResponse = await baseDbRequests.UpdateAsync(request.TicketId, entity);
+        var ticketResponse = await baseDbRequests.UpdateAsync(entity, request.TicketId);
 
         if (ticketResponse.Entity is null)
         {

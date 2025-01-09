@@ -10,20 +10,20 @@ using TRS.CoreApi.Handlers.Tickets;
 
 namespace TRS.CoreApi.Handlers.AccountBasketItems;
 
-public class  CreateAccountBasketItemCommand : IRequest<EntityResponse<AccountBasketTicket>>
+public class  UpdateAccountBasketItemCommand : IRequest<EntityResponse<AccountBasketTicket>>
 {
     public required Guid AccountId { get; set; }
     public required Guid TicketId { get; set; }
     public required int Amount { get; set; }
 }
 
-public class CreateAccountBasketItemHandler(IBaseDbRequests baseRequest,
+public class UpdateAccountBasketItemHandler(IBaseDbRequests baseRequest,
                                             IMediator mediator,
-                                             ILogger<CreateAccountBasketItemHandler> logger)
-    : IRequestHandler<CreateAccountBasketItemCommand, EntityResponse<AccountBasketTicket>>
+                                             ILogger<UpdateAccountBasketItemHandler> logger)
+    : IRequestHandler<UpdateAccountBasketItemCommand, EntityResponse<AccountBasketTicket>>
 {
     public async Task<EntityResponse<AccountBasketTicket>> Handle(
-        CreateAccountBasketItemCommand request,
+        UpdateAccountBasketItemCommand request,
         CancellationToken ct
     )
     {
@@ -47,20 +47,28 @@ public class CreateAccountBasketItemHandler(IBaseDbRequests baseRequest,
             };
         }
 
+        var accountBasketTicketResponse = await baseRequest.GetAsync<AccountBasketTicket>(new object[] { accountBasket.Id, ticket.Id });
+        if (accountBasketTicketResponse.Entity is null || accountBasketTicketResponse.Entity is not AccountBasketTicket accountBasketTicket)
+        {
+            logger.LogError("Failed to get Account Basket Item");
+            return accountBasketTicketResponse;
+        }
+
         var entity = new AccountBasketTicket
         {
             AccountBasketId = accountBasket.Id,
             TicketId = request.TicketId,
             Amount = request.Amount,
-            CreatedOn = DateHelper.DateTimeUtcNow
+            CreatedOn = accountBasketTicket.CreatedOn,
+            LastTimeEdited = DateHelper.DateTimeUtcNow
         };
 
-        var accountBasketTicketResponse = await baseRequest.CreateAsync(entity);
-        if (accountBasketTicketResponse.Entity is null || accountBasketTicketResponse.Entity is not AccountBasketTicket accountBasketTicket)
+        var updatedAccountBasketTicketResponse = await baseRequest.UpdateAsync(entity, accountBasket.Id, ticket.Id);
+        if (updatedAccountBasketTicketResponse.Entity is null || updatedAccountBasketTicketResponse.Entity is not AccountBasketTicket updatedAccountBasketTicket)
         {
             logger.LogError("Failed to create Account Basket Item");
-            return accountBasketTicketResponse;
+            return updatedAccountBasketTicketResponse;
         }
-        return accountBasketTicketResponse;
+        return updatedAccountBasketTicketResponse;
     }
 }

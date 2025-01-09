@@ -38,7 +38,7 @@ public class UpdateAccountHandler(
             PhoneNumber = request.PhoneNumber
         };
 
-        var accountResponse = await baseDbRequests.UpdateAsync(request.AccountId, entity, query => query.Include(a => a.AccountBalance));
+        var accountResponse = await baseDbRequests.UpdateAsync(entity, query => query.Include(a => a.AccountBalance), request.AccountId);
 
         if (accountResponse.Entity is null)
         {

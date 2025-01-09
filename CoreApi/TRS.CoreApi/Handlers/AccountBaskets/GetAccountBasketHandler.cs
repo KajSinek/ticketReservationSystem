@@ -12,7 +12,7 @@ public class GetAccountBasketCommand : IRequest<EntityResponse<AccountBasket>>
     public required Guid AccountId { get; set; }
 }
 
-public class GetccountBasketHandler(IBaseDbRequests baseDbRequests, IMediator mediator, ILogger<AccountBasket> logger)
+public class GetAccountBasketHandler(IBaseDbRequests baseDbRequests, IMediator mediator, ILogger<AccountBasket> logger)
     : IRequestHandler<GetAccountBasketCommand, EntityResponse<AccountBasket>>
 {
     public async Task<EntityResponse<AccountBasket>> Handle(

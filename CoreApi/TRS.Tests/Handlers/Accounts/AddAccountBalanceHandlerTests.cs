@@ -53,7 +53,7 @@ public class AddAccountBalanceHandlerTests : TestBase
             .GetEntityByPropertyAsync(Arg.Any<GetEntityByPropertyModel<AccountBalance>>())
             .Returns(accountBalanceResponse);
         _baseDbRequests
-            .UpdateAsync(Arg.Any<Guid>(), Arg.Any<AccountBalance>())
+            .UpdateAsync(Arg.Any<AccountBalance>(), Arg.Any<Guid>())
             .Returns(updatedAccountBalanceResponse);
 
         // Act
@@ -108,7 +108,7 @@ public class AddAccountBalanceHandlerTests : TestBase
             .GetEntityByPropertyAsync(Arg.Any<GetEntityByPropertyModel<AccountBalance>>())
             .Returns(accountBalanceResponse);
         _baseDbRequests
-            .UpdateAsync(Arg.Any<Guid>(), Arg.Any<AccountBalance>())
+            .UpdateAsync(Arg.Any<AccountBalance>(), Arg.Any<Guid>())
             .Returns(updatedAccountBalanceResponse);
 
         // Act

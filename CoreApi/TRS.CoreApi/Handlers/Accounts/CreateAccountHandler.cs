@@ -58,7 +58,7 @@ public class CreateAccountHandler(
             return new EntityResponse<Account> { Errors = accountBalanceResponse.Errors };
         }
 
-        var updateAccountResponse = await baseDbRequests.UpdateAsync(account.Id, account);
+        var updateAccountResponse = await baseDbRequests.UpdateAsync(account, account.Id);
 
         if (updateAccountResponse.IsFailure || updateAccountResponse.Entity is not Account updatedAccount)
         {

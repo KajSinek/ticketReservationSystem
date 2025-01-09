@@ -14,6 +14,7 @@ namespace BusReservationSystem.Controllers;
 public partial class AccountsController(IMediator mediator) : ControllerBase
 {
     public const string GetAccountRouteName = "GetAccount";
+    public const string GetAccountBasketItemRouteName = "GetAccountBasketItem";
 
     [HttpPost]
     [Route("api/accounts")]
