@@ -71,7 +71,7 @@ public class UpdateAccountBalanceHandler(
         }
 
 
-        var updatedAccountBalanceResponse = await baseDbRequests.UpdateAsync(accountBalance.Id, entity);
+        var updatedAccountBalanceResponse = await baseDbRequests.UpdateAsync(entity, accountBalance.Id);
 
         if (updatedAccountBalanceResponse.Entity is null)
         {

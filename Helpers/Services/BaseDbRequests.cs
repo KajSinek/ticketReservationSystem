@@ -34,72 +34,124 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
         };
     }
 
-    public async Task<EntityResponse<T>> UpdateAsync<T>(
-    Guid id,
-    T entity,
-    Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
+    public Task<EntityResponse<T>> UpdateAsync<T>(T entity, params object[] keyValues) where T : class
     {
-        // Fetch the entity using query configurator
-        var query = _context.Set<T>().AsQueryable();
-        if (queryConfigurator != null)
+        return UpdateAsync(entity, null, keyValues);
+    }
+
+    public async Task<EntityResponse<T>> UpdateAsync<T>(
+    T entity,
+    Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null,
+    params object[] keyValues) where T : class
+    {
+        var response = new EntityResponse<T>();
+
+        // Ensure keyValues are provided
+        if (keyValues == null || keyValues.Length == 0)
         {
-            query = queryConfigurator(query); // Apply includes or other query configurations
+            response.Errors.Add("Key values are required.");
+            response.StatusCode = HttpStatusCode.BadRequest;
+            return response;
         }
 
-        var foundEntity = await query.FirstOrDefaultAsync(e =>
-            EF.Property<Guid>(e, "Id") == id); // Replace "Id" with the actual primary key property if different
+        // Retrieve the entity using composite keys
+        var foundEntity = await _context.Set<T>().FindAsync(keyValues);
 
         if (foundEntity == null)
         {
-            return new EntityResponse<T>
-            {
-                Errors = new List<string> { "Entity not found." },
-                StatusCode = HttpStatusCode.NotFound
-            };
+            response.Errors.Add("Entity not found.");
+            response.StatusCode = HttpStatusCode.NotFound;
+            return response;
         }
 
         // Update the entity
         _context.Entry(foundEntity).CurrentValues.SetValues(entity);
         await _context.SaveChangesAsync();
 
-        // Re-fetch the updated entity with the query configurator applied
-        var updatedQuery = _context.Set<T>().AsNoTracking(); // No tracking for the response
+        // Re-fetch the updated entity with query configurator applied (optional)
+        var updatedQuery = _context.Set<T>().AsNoTracking();
         if (queryConfigurator != null)
         {
-            updatedQuery = queryConfigurator(updatedQuery); // Reapply the includes
+            updatedQuery = queryConfigurator(updatedQuery);
         }
 
-        var updatedEntity = await updatedQuery.FirstOrDefaultAsync(e =>
-            EF.Property<Guid>(e, "Id") == id); // Replace "Id" with your primary key property name
+        // Retrieve primary key property names dynamically
+        var keyProperties = _context.Model.FindEntityType(typeof(T))
+                              ?.FindPrimaryKey()
+                              ?.Properties
+                              .Select(p => p.Name)
+                              .ToArray();
+
+        if (keyProperties == null || keyProperties.Length != keyValues.Length)
+        {
+            response.Errors.Add("Mismatch between key values and entity's primary key properties.");
+            response.StatusCode = HttpStatusCode.BadRequest;
+            return response;
+        }
+
+        // Build the composite key condition dynamically
+        var parameter = Expression.Parameter(typeof(T), "e");
+        Expression compositeCondition = Expression.Constant(true); // Start with a "true" condition
+
+        for (int i = 0; i < keyProperties.Length; i++)
+        {
+            var propertyExpression = Expression.Property(parameter, keyProperties[i]);
+            var keyValueExpression = Expression.Constant(keyValues[i]);
+            var equalsExpression = Expression.Equal(propertyExpression, keyValueExpression);
+
+            compositeCondition = Expression.AndAlso(compositeCondition, equalsExpression);
+        }
+
+        var lambda = Expression.Lambda<Func<T, bool>>(compositeCondition, parameter);
+
+        // Apply the lambda expression
+        var updatedEntity = await updatedQuery.FirstOrDefaultAsync(lambda);
 
         if (updatedEntity == null)
         {
-            return new EntityResponse<T>
-            {
-                Errors = new List<string> { "Updated entity could not be retrieved." },
-                StatusCode = HttpStatusCode.NotFound
-            };
+            response.Errors.Add("Failed to retrieve the updated entity.");
+            response.StatusCode = HttpStatusCode.NotFound;
+            return response;
         }
 
-        return new EntityResponse<T>
-        {
-            Entity = updatedEntity
-        };
+        response.Entity = updatedEntity;
+        return response;
     }
 
-    public Task<Response> DeleteAsync<T>(Guid id, Func<IQueryable<T>, IQueryable<T>> queryConfigurator = null) where T : class
+    public Task<Response> DeleteAsync<T>(params object[] keyValues) where T : class
     {
-        var data = GetAsync<T>(id, queryConfigurator);
+        return DeleteAsync<T>(null, keyValues);
+    }
+
+    public async Task<Response> DeleteAsync<T>(
+    Func<IQueryable<T>, IQueryable<T>> queryConfigurator,
+    params object[] keyValues) where T : class
+    {
         var response = new Response();
-        if (data.Result.Entity == null)
+
+        // Ensure keyValues are not null or empty
+        if (keyValues == null || keyValues.Length == 0)
         {
-            response.Errors.Add(string.Format(ErrorMessages.EntityNotFound, typeof(T).ToString(), id));
-            response.StatusCode = HttpStatusCode.NotFound;
-            return Task.FromResult(response);
+            response.Errors.Add("Key values are required.");
+            response.StatusCode = HttpStatusCode.BadRequest;
+            return response;
         }
-        _context.Set<T>().Remove(data.Result.Entity);
-        _context.SaveChanges();
-        return Task.FromResult(response);
+
+        // Retrieve the entity using composite keys
+        var entity = await _context.Set<T>().FindAsync(keyValues);
+
+        if (entity == null)
+        {
+            response.Errors.Add(string.Format(ErrorMessages.EntityNotFound, typeof(T).Name, string.Join(", ", keyValues)));
+            response.StatusCode = HttpStatusCode.NotFound;
+            return response;
+        }
+
+        // Remove the entity
+        _context.Set<T>().Remove(entity);
+        await _context.SaveChangesAsync();
+
+        return response;
     }
 
     public async Task<EntitiesResponse<T>> GetAllAsync<T>(
@@ -177,7 +229,6 @@ public class BaseDbRequests<TContext> : IBaseDbRequests
 
         return new EntityResponse<T> { Entity = entity };
     }
-
 
     public async Task<EntityResponse<T>> GetEntityByPropertyAsync<T>(GetEntityByPropertyModel<T> model) where T : class
     {

@@ -19,7 +19,7 @@ public class GetAccountHandler(IBaseDbRequests baseDbRequests, ILogger<GetAccoun
         CancellationToken cancellationToken
     )
     {
-        var accountResponse = await baseDbRequests.GetAsync<Account>(request.AccountId, query => query.Include(x => x.AccountBalance));
+        var accountResponse = await baseDbRequests.GetAsync<Account>(request.AccountId, query => query.Include(x => x.AccountBalance).Include(x => x.AccountBasket));
 
         if (accountResponse.Entity is null)
         {

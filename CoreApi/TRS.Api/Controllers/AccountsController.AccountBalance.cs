@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TRS.CoreApi.Entities;
 using TRS.CoreApi.Handlers.AccountBalances;
-using TRS.CoreApi.Handlers.Accounts;
 using TRS.CoreApi.Mapping;
 using TRS.CoreApi.Models;
 

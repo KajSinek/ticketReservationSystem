@@ -1,29 +1,26 @@
 ﻿using Helpers.Resources;
 using Helpers.Responses;
 using Helpers.Services;
-using Helpers.Utilities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using TRS.CoreApi.Entities;
 using TRS.CoreApi.Handlers.Accounts;
 using TRS.CoreApi.Handlers.Tickets;
 
 namespace TRS.CoreApi.Handlers.AccountBasketItems;
 
-public class  CreateAccountBasketItemCommand : IRequest<EntityResponse<AccountBasketTicket>>
+public class DeleteAccountBasketItemCommand : IRequest<Response>
 {
     public required Guid AccountId { get; set; }
     public required Guid TicketId { get; set; }
-    public required int Amount { get; set; }
 }
 
-public class CreateAccountBasketItemHandler(IBaseDbRequests baseRequest,
+public class DeleteAccountBasketItemHandler(IBaseDbRequests baseRequest,
                                             IMediator mediator,
-                                             ILogger<CreateAccountBasketItemHandler> logger)
-    : IRequestHandler<CreateAccountBasketItemCommand, EntityResponse<AccountBasketTicket>>
+                                            ILogger<DeleteAccountBasketItemHandler> logger)
+    : IRequestHandler<DeleteAccountBasketItemCommand, Response>
 {
-    public async Task<EntityResponse<AccountBasketTicket>> Handle(
-        CreateAccountBasketItemCommand request,
+    public async Task<Response> Handle(
+        DeleteAccountBasketItemCommand request,
         CancellationToken ct
     )
     {
@@ -47,16 +44,8 @@ public class CreateAccountBasketItemHandler(IBaseDbRequests baseRequest,
             };
         }
 
-        var entity = new AccountBasketTicket
-        {
-            AccountBasketId = accountBasket.Id,
-            TicketId = request.TicketId,
-            Amount = request.Amount,
-            CreatedOn = DateHelper.DateTimeUtcNow
-        };
-
-        var accountBasketTicketResponse = await baseRequest.CreateAsync(entity);
-        if (accountBasketTicketResponse.Entity is null || accountBasketTicketResponse.Entity is not AccountBasketTicket accountBasketTicket)
+        var accountBasketTicketResponse = await baseRequest.DeleteAsync<AccountBasketTicket>(accountBasket.Id, ticket.Id);
+        if (accountBasketTicketResponse.IsFailure)
         {
             logger.LogError("Failed to create Account Basket Item");
             return accountBasketTicketResponse;

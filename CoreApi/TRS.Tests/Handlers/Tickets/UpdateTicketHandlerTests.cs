@@ -40,7 +40,7 @@ public class UpdateTicketHandlerTests : TestBase
 
         var response = new EntityResponse<Ticket> { Entity = updatedTicket };
 
-        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Ticket>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Ticket>(), Arg.Any<Guid>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -72,7 +72,7 @@ public class UpdateTicketHandlerTests : TestBase
             Errors = new List<string> { "Error" }
         };
 
-        _baseDbRequests.UpdateAsync(Arg.Any<Guid>(), Arg.Any<Ticket>()).Returns(response);
+        _baseDbRequests.UpdateAsync(Arg.Any<Ticket>(), Arg.Any<Guid>()).Returns(response);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
